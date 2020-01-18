@@ -24,6 +24,7 @@
  */
 package net.runelite.client.plugins.prayer;
 
+import java.lang.Runtime;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
@@ -36,32 +37,43 @@ import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
+import net.runelite.client.ui.overlay.tooltip.Tooltip;
+import net.runelite.client.ui.overlay.tooltip.TooltipManager;
+
 
 @Singleton
 class PrayerFlickOverlay extends Overlay
 {
 	private final Client client;
 	private final PrayerPlugin plugin;
+	private final TooltipManager tooltipManager;
+
+	private boolean tickComplete = false;
+	private double prevTick = 0.0;
+	private Runtime rt;
 
 	@Inject
-	private PrayerFlickOverlay(Client client, PrayerPlugin plugin)
+	private PrayerFlickOverlay(Client client, PrayerPlugin plugin, final TooltipManager tooltipManager)
 	{
+		rt = Runtime.getRuntime();
 		setPosition(OverlayPosition.DYNAMIC);
 		setLayer(OverlayLayer.ABOVE_WIDGETS);
+
 		this.client = client;
 		this.plugin = plugin;
+		this.tooltipManager = tooltipManager;
 	}
 
 	@Override
 	public Dimension render(Graphics2D graphics)
 	{
 		// If there are no prayers active or flick location is set to the prayer bar we don't require the flick helper
-		if ((!plugin.isPrayersActive() && !plugin.isPrayerFlickAlwaysOn())
+		/*if ((ticksWithPrayerOff > 50 && !plugin.isPrayerFlickAlwaysOn())
 			|| plugin.getPrayerFlickLocation().equals(PrayerFlickLocation.NONE)
 			|| plugin.getPrayerFlickLocation().equals(PrayerFlickLocation.PRAYER_BAR))
 		{
 			return null;
-		}
+		}*/
 
 		Widget xpOrb = client.getWidget(WidgetInfo.MINIMAP_QUICK_PRAYER_ORB);
 		if (xpOrb == null)
@@ -75,22 +87,38 @@ class PrayerFlickOverlay extends Overlay
 			return null;
 		}
 
-		//Purposefully using height twice here as the bounds of the prayer orb includes the number sticking out the side
-		int orbInnerHeight = (int) bounds.getHeight();
-
-		int orbInnerX = (int) (bounds.getX() + 24);//x pos of the inside of the prayer orb
-		int orbInnerY = (int) (bounds.getY() - 1);//y pos of the inside of the prayer orb
-
 		double t = plugin.getTickProgress();
+		if(t - prevTick < -1.0){
+			tickComplete = false;
+		}
 
-		int xOffset = (int) (-Math.cos(t) * orbInnerHeight / 2) + orbInnerHeight / 2;
-		int indicatorHeight = (int) (Math.sin(t) * orbInnerHeight);
+		if(plugin.isPrayersActive()){
+			//Purposefully using height twice here as the bounds of the prayer orb includes the number sticking out the side
+			int orbInnerHeight = (int) bounds.getHeight();
+			int orbInnerX = (int) (bounds.getX() + 24);//x pos of the inside of the prayer orb
+			int orbInnerY = (int) (bounds.getY() - 1);//y pos of the inside of the prayer orb
+			int xOffset = (int) (-Math.cos(t) * orbInnerHeight / 2) + orbInnerHeight / 2;
+			int indicatorHeight = (int) (Math.sin(t) * orbInnerHeight);
+			int yOffset = (orbInnerHeight / 2) - (indicatorHeight / 2);
 
-		int yOffset = (orbInnerHeight / 2) - (indicatorHeight / 2);
+			graphics.setColor(Color.cyan);
+			graphics.fillRect(orbInnerX + xOffset, orbInnerY + yOffset, 1, indicatorHeight);
+		}
 
-		graphics.setColor(Color.cyan);
-		graphics.fillRect(orbInnerX + xOffset, orbInnerY + yOffset, 1, indicatorHeight);
+		if(plugin.isPrayersActive() && !tickComplete && (
+			(t > 0.6 && Math.random() < 0.70) ||
+			(t > 1.0 && Math.random() < 0.90)
+		)){
+			try {
+				boolean hoveringQuickPray = tooltipManager.getTooltips().get(0).getText().contains("Quick-prayers");
+				if(hoveringQuickPray){
+					tickComplete = true;
+					rt.exec("/home/boar/code/rotbot/double-click");
+				}
+			} catch(Exception e){}
+		}
 
+		prevTick = t;
 		return new Dimension((int) bounds.getWidth(), (int) bounds.getHeight());
 	}
 }
