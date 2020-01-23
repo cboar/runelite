@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Adam <Adam@sigterm.info>
+ * Copyright (c) 2020, Hexagon <hexagon@fking.work>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,30 +22,27 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.http.api.animation;
+package net.runelite.cache.definitions;
 
-public class AnimationKey
+import lombok.Data;
+
+@Data
+public class HitSplatDefinition
 {
-	private int npcid;
-	private int[] animations;
-
-	public int getNPCId()
-	{
-		return npcid;
-	}
-
-	public void setNPCId(int npcid)
-	{
-		this.npcid = npcid;
-	}
-
-	public int[] getAnimations()
-	{
-		return animations;
-	}
-
-	public void setAnimations(int[] keys)
-	{
-		this.animations = keys;
-	}
+	private String stringFormat = "";
+	private int varbitID = -1;
+	private int leftSprite = -1;
+	private int leftSprite2 = -1;
+	private int rightSpriteId = -1;
+	private int fontType = -1;
+	private int backgroundSprite = -1;
+	private int varpID = -1;
+	private int useDamage = -1;
+	private int textColor = 0xFFFFFF;
+	private int displayCycles = 70;
+	private int[] multihitsplats;
+	private int scrollToOffsetX = 0;
+	private int fadeStartCycle = -1;
+	private int scrollToOffsetY = 0;
+	private int textOffsetY = 0;
 }

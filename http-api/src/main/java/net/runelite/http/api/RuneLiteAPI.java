@@ -67,6 +67,8 @@ public class RuneLiteAPI
 	private static final String OPENOSRS_BASE = /*"https://api.openosrs.com*/ "https://api.runelitepl.us";
 	private static final String OPENOSRS_SESSION = "http://session.openosrs.dev";
 	private static final String OPENOSRS_XTEA = "http://xtea.openosrs.dev";
+	private static final String OPENOSRS_ANIMATIONS = "http://animations.openosrs.dev";
+	private static final String OPENOSRS_SOUNDS = "http://sounds.openosrs.dev";
 	private static final String MAVEN_METADATA = "http://repo.runelite.net/net/runelite/runelite-parent/maven-metadata.xml";
 
 	private static final Properties properties = new Properties();
@@ -125,6 +127,16 @@ public class RuneLiteAPI
 	public static HttpUrl getXteaBase()
 	{
 		return HttpUrl.parse(OPENOSRS_XTEA);
+	}
+
+	public static HttpUrl getAnimationsBase()
+	{
+		return HttpUrl.parse(OPENOSRS_ANIMATIONS);
+	}
+
+	public static HttpUrl getSoundsBase()
+	{
+		return HttpUrl.parse(OPENOSRS_SOUNDS);
 	}
 
 	public static HttpUrl getApiBase()

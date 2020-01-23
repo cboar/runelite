@@ -22,33 +22,56 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.http.api.animation;
+package net.runelite.client.plugins.sounds;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
+import java.util.HashMap;
+import javax.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.Client;
+import net.runelite.api.events.SoundEffectPlayed;
+import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.plugins.Plugin;
+import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.http.api.sounds.SoundsClient;
+import org.apache.commons.lang3.ArrayUtils;
 
-public class AnimationRequest
+@PluginDescriptor(
+	name = "Sounds",
+	hidden = true
+)
+@Slf4j
+public class SoundsPlugin extends Plugin
 {
-	private int revision;
-	private List<AnimationKey> keys = new ArrayList<>();
+	private final SoundsClient soundsClient = new SoundsClient();
 
-	public int getRevision()
+	private HashMap<Integer, int[]> sounds;
+	@Inject
+	private Client client;
+
 	{
-		return revision;
+		try
+		{
+			sounds = soundsClient.get();
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
 	}
 
-	public void setRevision(int revision)
+	@Subscribe
+	private void onSoundEffectPlayed(SoundEffectPlayed event)
 	{
-		this.revision = revision;
-	}
-
-	public List<AnimationKey> getKeys()
-	{
-		return keys;
-	}
-
-	public void addKey(AnimationKey key)
-	{
-		keys.add(key);
+		if (event.getNpcid() != -1)
+		{
+			if (ArrayUtils.contains(sounds.get(event.getNpcid()), event.getSoundId()))
+			{
+				return;
+			}
+			int[] newSounds = ArrayUtils.add(sounds.get(event.getNpcid()), event.getSoundId());
+			sounds.put(event.getNpcid(), newSounds);
+			soundsClient.submit(event.getNpcid(), event.getSoundId());
+		}
 	}
 }
