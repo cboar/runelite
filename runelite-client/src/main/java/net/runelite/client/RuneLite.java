@@ -99,7 +99,7 @@ public class RuneLite
 	public static final File RUNELITE_DIR = new File(System.getProperty("user.home"), ".runelite");
 	public static final File CACHE_DIR = new File(RUNELITE_DIR, "cache");
 	public static final File PROFILES_DIR = new File(RUNELITE_DIR, "profiles");
-	public static final File PLUGIN_DIR = new File(RUNELITE_DIR, "plugins");
+	public static final File PLUGIN_DIR = new File("/ext/games/runelite/plugins/release");
 	public static final File EXTERNALPLUGIN_DIR = new File(RUNELITE_DIR, "externalmanager");
 	public static final File SCREENSHOT_DIR = new File(RUNELITE_DIR, "screenshots");
 	public static final File LOGS_DIR = new File(RUNELITE_DIR, "logs");
