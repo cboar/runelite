@@ -1,0 +1,3 @@
+#!/bin/bash
+
+java -Duser.home="/home/boar/.osrs$1" -jar ./runelite-client/build/libs/runelite-client-*-SNAPSHOT-shaded.jar
